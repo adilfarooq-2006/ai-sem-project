@@ -1,9 +1,9 @@
 
 
 #helper function to calculate cargo weight based purely on injured count.
-def calculateDemand(city):
+def calculateDemand(flooded_city_data):
     
-    injured_count = city.get("injured_count", 0)
+    injured_count = flooded_city_data.get("injured_count", 0)
 
     #for each person 5kg of supplies is needed (assumption)
     SUPPLY_PER_PERSON = 5
@@ -11,11 +11,11 @@ def calculateDemand(city):
     needed_weight = injured_count * SUPPLY_PER_PERSON
 
     return {
-        "city_name": city["name"],
+        "city_name": flooded_city_data["name"],
         "injured_count": injured_count,   # PRIORITY SCORE
         "needed_weight": needed_weight,   # CONSTRAINT CHECKING
-        "road_status": city["road_status"],
-        "location": city["coords"]
+        "road_status": flooded_city_data["road_status"],
+        "location": flooded_city_data["coords"]
     }
 
 
@@ -29,7 +29,7 @@ def initializeFleet():
         fleet.append({
             "id": f"Truck-{i}",
             "type": "truck",
-            "capacity": 2500,  # kg (Example High Cap)
+            "capaflooded_city_data": 2500,  # kg (Example High Cap)
             "speed": "slow",
             "available": True
         })
@@ -39,7 +39,7 @@ def initializeFleet():
         fleet.append({
             "id": f"Drone-{i}",
             "type": "drone",
-            "capacity": 50,  # kg
+            "capaflooded_city_data": 50,  # kg
             "speed": "fast",
             "available": True
         })
@@ -49,7 +49,7 @@ def initializeFleet():
         fleet.append({
             "id": f"Helicopter-{i}",
             "type": "drone",
-            "capacity": 20000,  # kg
+            "capaflooded_city_data": 20000,  # kg
             "speed": "fast",
             "available": True
         })
@@ -57,4 +57,11 @@ def initializeFleet():
     return fleet
 
 
+# Constrains CSP
+def check_vehicle_assignment(vehicle, city_demand):
+
+    """
+    Validates if a specific vehicle can handle a specific city's request.
+    Returns: True (Valid) or False (Invalid)
+    """
 
