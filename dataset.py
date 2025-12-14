@@ -989,6 +989,12 @@ punjab_cities = {
         "population": 2100000,
         "neighbors": {"Islamabad": 20, "Gujar Khan": 50, "Taxila": 30, "Kahuta": 35}
     },
+    "Islamabad": {
+        "coords": (33.6996, 73.0362),
+        "elevation": 540,
+        "population": 1100000,
+        "neighbors": {"Rawalpindi": 20 }
+    },
     "Renala Khurd": {
         "coords": (30.8833, 73.6000),
         "elevation": 175,
