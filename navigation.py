@@ -200,3 +200,58 @@ def mutate_path(path, target_node, graph_data, mutation_rate=0.3):
         
     # If regrowth failed (dead end), return original path
     return path
+
+
+def run_genetic_navigation(start, end, graph_data, generations=100, pop_size=20):
+    # 1. INITIALIZE
+    population = create_initial_population(start, end, graph_data, pop_size)
+    
+    if not population:
+        print("[GA FAILED] Could not generate any valid paths.")
+        return None
+
+    best_global_path = None
+    best_global_score = -1
+
+    print(f"[GA STARTED] Evolving routes from {start} to {end}...")
+
+    for gen in range(generations):
+        # 2. EVALUATE (Calculate Fitness for all)
+        # Create a list of tuples: (score, path)
+        scored_pop = []
+        for p in population:
+            score = calculate_fitness(p, graph_data)
+            scored_pop.append((score, p))
+        
+        # Sort: High score first
+        scored_pop.sort(key=lambda x: x[0], reverse=True)
+        
+        # Track Best
+        current_best_score, current_best_path = scored_pop[0]
+        if current_best_score > best_global_score:
+            best_global_score = current_best_score
+            best_global_path = current_best_path
+
+        current_gen = gen + 1
+        if current_gen in [1, 50, 100]:
+            print(f"\n[GEN {current_gen}] Best Score: {best_global_score:.2f}")
+            print(f"Path: {best_global_path}")
+            
+        # 3. SELECTION (Survival of the Fittest)
+        # Keep top 50% (Elitism)
+        survivors = scored_pop[:pop_size // 2]
+        
+        # 4. REPOPULATE (Breeding/Mutation)
+        new_population = [s[1] for s in survivors] # Keep the parents
+        
+        while len(new_population) < pop_size:
+            # Pick a random parent from survivors to clone & mutate
+            parent = random.choice(survivors)[1]
+            
+            # Create Child via Mutation
+            child = mutate_path(parent, end, graph_data)
+            new_population.append(child)
+            
+        population = new_population
+
+    return best_global_path
