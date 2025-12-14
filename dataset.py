@@ -11,7 +11,7 @@ punjab_cities = {
         "population": 142000,
         "neighbors": {"Bahawalpur": 50, "Khanpur": 45, "Yazman": 55}
     },
-    "Alipur Chatha": {
+    "Alipur": {
         "coords": (32.2683, 73.8190),
         "elevation": 210,
         "population": 65000,
@@ -93,7 +93,7 @@ punjab_cities = {
         "coords": (32.4833, 72.9100),
         "elevation": 200,
         "population": 45000,
-        "neighbors": {"Miani": 15, "Malakwal": 28, "Pind Dadan Khan": 35}
+        "neighbors": {"Malakwal": 28, "Pind Dadan Khan": 35}
     },
     "Bhopalwala": {
         "coords": (32.4200, 74.3600),
@@ -129,7 +129,7 @@ punjab_cities = {
         "coords": (30.5100, 72.6500),
         "elevation": 158,
         "population": 5500,
-        "neighbors": {"Chichawatni": 12, "Sahiwal": 28, "Harappa": 20}
+        "neighbors": {"Chichawatni": 12, "Sahiwal": 28}
     },
     "Chak Two Hundred Forty-Nine TDA": { # Chak 249 TDA
         "coords": (31.1000, 71.1800),
@@ -231,7 +231,7 @@ punjab_cities = {
         "coords": (30.0489, 70.6455),
         "elevation": 120,
         "population": 400000,
-        "neighbors": {"Kot Chutta": 20, "Taunsa": 80, "Muzaffargarh": 55}
+        "neighbors": { "Taunsa": 80, "Muzaffargarh": 55}
     },
     "Dhanot": {
         "coords": (29.7500, 71.7500),
@@ -257,7 +257,7 @@ punjab_cities = {
         "population": 48000,
         "neighbors": {"Faisalabad": 28, "Gojra": 30, "Samundri": 25}
     },
-    "Dinan Bashnoian Wala": {
+    "Dina": {
         "coords": (29.7600, 73.2500),
         "elevation": 150,
         "population": 25000,
@@ -315,7 +315,7 @@ punjab_cities = {
         "coords": (32.0333, 72.4167),
         "elevation": 185,
         "population": 25000,
-        "neighbors": {"Sahiwal (Sargodha)": 15, "Sillanwali": 20, "Shahpur": 35}
+        "neighbors": {"Sahiwal": 15, "Sillanwali": 20, "Shahpur": 35}
     },
     "Fazilpur": {
         "coords": (29.3000, 70.4833),
@@ -375,7 +375,7 @@ punjab_cities = {
         "coords": (32.0679, 73.6854),
         "elevation": 207,
         "population": 280000,
-        "neighbors": {"Pindi Bhattian": 35, "Alipur Chatha": 30, "Sheikhupura": 55}
+        "neighbors": {"Pindi Bhattian": 35, "Alipur": 30, "Sheikhupura": 55}
     },
     "Harnoli": {
         "coords": (32.3167, 71.5500),
@@ -419,7 +419,7 @@ punjab_cities = {
         "population": 92000,
         "neighbors": {"Dipalpur": 22, "Okara": 28, "Chunian": 35}
     },
-    "Jahanian Shah": { # Jahanian
+    "Jahanian": { # Jahanian
         "coords": (30.3028, 71.9328),
         "elevation": 135,
         "population": 60000,
@@ -495,7 +495,7 @@ punjab_cities = {
         "coords": (32.9405, 73.7283),
         "elevation": 233,
         "population": 190000,
-        "neighbors": {"Dina": 18, "Sarai Alamgir": 12, "Kharian": 25, "Mirpur": 40}
+        "neighbors": {"Dina": 18, "Sarai Alamgir": 12, "Kharian": 25}
     },
     "Kabirwala": {
         "coords": (30.4068, 71.8667),
@@ -669,7 +669,7 @@ punjab_cities = {
         "coords": (32.1931, 73.0292),
         "elevation": 192,
         "population": 50000,
-        "neighbors": {"Bhalwal": 25, "Sargodha": 40, "Midh Ranjha": 20}
+        "neighbors": {"Bhalwal": 25, "Sargodha": 40}
     },
     "Kot Radha Kishan": {
         "coords": (31.1717, 74.0997),
@@ -777,7 +777,7 @@ punjab_cities = {
         "coords": (33.1500, 73.6333),
         "elevation": 280,
         "population": 15000,
-        "neighbors": {"Dina": 10, "Jhelum": 20, "Mirpur": 15}
+        "neighbors": {"Dina": 10, "Jhelum": 20}
     },
     "Mankera": {
         "coords": (31.3889, 71.4417),
@@ -813,13 +813,13 @@ punjab_cities = {
         "coords": (30.1642, 73.5683),
         "elevation": 165,
         "population": 37000,
-        "neighbors": {"Bahawalnagar": 35, "Mcleod Ganj": 20, "Pakpattan": 55}
+        "neighbors": {"Bahawalnagar": 35, "Pakpattan": 55}
     },
     "Mitha Tiwana": {
         "coords": (32.2500, 72.1000),
         "elevation": 185,
         "population": 30000,
-        "neighbors": {"Hadali": 8, "Jauharabad": 20, "Adhi Kot": 25}
+        "neighbors": {"Hadali": 8, "Jauharabad": 20}
     },
     "Moza Shahwala": {
         "coords": (30.0800, 71.3500), # Near Multan Chenab area
@@ -903,7 +903,7 @@ punjab_cities = {
         "coords": (31.0214, 73.8531),
         "elevation": 186,
         "population": 100000,
-        "neighbors": {"Okara": 45, "Chunian": 20, "Kot Radha Kishan": 25, "Bhai Pheru": 15}
+        "neighbors": {"Okara": 45, "Chunian": 20, "Kot Radha Kishan": 25}
     },
     "Phalia": {
         "coords": (32.4333, 73.5833),
@@ -981,7 +981,7 @@ punjab_cities = {
         "coords": (32.3333, 73.7833),
         "elevation": 220,
         "population": 18000,
-        "neighbors": {"Wazirabad": 25, "Alipur Chatha": 15, "Qila Didar Singh": 20}
+        "neighbors": {"Wazirabad": 25, "Alipur": 15, "Qila Didar Singh": 20}
     },
     "Rawalpindi": {
         "coords": (33.5651, 73.0169),
@@ -999,7 +999,7 @@ punjab_cities = {
         "coords": (30.8833, 73.6000),
         "elevation": 175,
         "population": 54000,
-        "neighbors": {"Okara": 15, "Pattoki": 25, "Depalpur": 30}
+        "neighbors": {"Okara": 15, "Pattoki": 25}
     },
     "Rojhan": {
         "coords": (28.6867, 70.3311),
@@ -1017,7 +1017,7 @@ punjab_cities = {
         "coords": (30.6682, 73.1114),
         "elevation": 165,
         "population": 389000,
-        "neighbors": {"Harappa": 25, "Okara": 38, "Chichawatni": 40, "Pakpattan": 48}
+        "neighbors": { "Okara": 38, "Chichawatni": 40, "Pakpattan": 48}
     },
     "Sambrial": {
         "coords": (32.4750, 74.3528),
@@ -1077,7 +1077,7 @@ punjab_cities = {
         "coords": (32.2625, 75.1592),
         "elevation": 260,
         "population": 125000,
-        "neighbors": {"Narowal": 35, "Zafarwal": 25, "Naina Kot": 15}
+        "neighbors": {"Narowal": 35, "Zafarwal": 25}
     },
     "Sharqpur": {
         "coords": (31.4628, 74.1039),
@@ -1121,7 +1121,7 @@ punjab_cities = {
         "population": 22000,
         "neighbors": {"Wazirabad": 6, "Gujranwala": 38, "Sambrial": 25}
     },
-    "Sukheke Mandi": {
+    "Sukheke": {
         "coords": (31.8617, 73.5078),
         "elevation": 205,
         "population": 42000,
@@ -1143,13 +1143,19 @@ punjab_cities = {
         "coords": (30.5283, 72.2417),
         "elevation": 145,
         "population": 28000,
-        "neighbors": {"Mian Channun": 15, "Kabirwala": 35, "Abdul Hakim": 12}
+        "neighbors": {"Mian Channun": 15, "Kabirwala": 35}
     },
     "Tandlianwala": {
         "coords": (31.0333, 73.1333),
         "elevation": 178,
         "population": 65000,
         "neighbors": {"Faisalabad": 45, "Samundri": 20, "Okara": 55}
+    },
+    "Samundri": {
+        "coords": (31.0646, 72.9520),
+        "elevation": 180,
+        "population": 65000,
+        "neighbors": {"Tandlianwala:": 20}
     },
     "Taunsa": { # Taunsa Sharif
         "coords": (30.7036, 70.6506),
@@ -1179,7 +1185,7 @@ punjab_cities = {
         "coords": (31.5458, 73.8344),
         "elevation": 200,
         "population": 35000,
-        "neighbors": {"Nankana Sahib": 20, "Ferozewatwan": 15, "Sheikhupura": 35}
+        "neighbors": {"Nankana Sahib": 20, "Sheikhupura": 35}
     },
     "Wazirabad": {
         "coords": (32.4433, 74.1200),
@@ -1191,7 +1197,7 @@ punjab_cities = {
         "coords": (29.1219, 71.7442),
         "elevation": 115,
         "population": 55000,
-        "neighbors": {"Bahawalpur": 32, "Ahmedpur East": 55, "Kudwala": 45}
+        "neighbors": {"Bahawalpur": 32, "Ahmedpur East": 55}
     },
     "Zafarwal": {
         "coords": (32.3442, 74.9033),

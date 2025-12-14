@@ -62,7 +62,7 @@ def select_best_hub(target_city, cities_data):
 def get_random_valid_path(start_node, target_node, graph_data, max_attempts=100):
     """
     Tries to find ONE random path from start to target.
-    Returns the path (list of strings) or None if it fails.
+    Includes SAFETY CHECKS for missing cities in dataset.
     """
     for _ in range(max_attempts):
         # 1. Start a new journey
@@ -72,10 +72,20 @@ def get_random_valid_path(start_node, target_node, graph_data, max_attempts=100)
         
         # 2. Walk until we reach target or get stuck
         while current_node != target_node:
-            neighbors = list(graph_data[current_node]['neighbors'].keys())
+            # --- SAFETY CHECK 1: DOES CURRENT NODE EXIST? ---
+            if current_node not in graph_data:
+                # If we walked into a ghost city, abort this path immediately
+                break
             
-            # Filter neighbors: Only move to ones we haven't visited yet
-            valid_moves = [n for n in neighbors if n not in visited]
+            # Get neighbor dictionary safely
+            neighbors_dict = graph_data[current_node].get('neighbors', {})
+            
+            # --- SAFETY CHECK 2: FILTER VALID MOVES ---
+            # Only choose neighbors that:
+            # a) We haven't visited yet
+            # b) ACTUALLY EXIST in the main graph_data (Prevent KeyError)
+            valid_moves = [n for n in neighbors_dict.keys() 
+                           if n not in visited and n in graph_data]
             
             if not valid_moves:
                 # Dead end! Break inner loop to restart this attempt
@@ -94,7 +104,6 @@ def get_random_valid_path(start_node, target_node, graph_data, max_attempts=100)
                 return path
                 
     return None # Failed to find a path after many tries
-
 
 def create_initial_population(start_node, target_node, graph_data, pop_size=20):
     """
