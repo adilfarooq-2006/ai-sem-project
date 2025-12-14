@@ -139,3 +139,9 @@ def run_flood_simulation(start_city, cities_data, max_cities_limit=25):
                         cities_flooded_count += 1
 
     print(f"SIMULATION COMPLETE Total Affected Cities {cities_flooded_count}")
+
+    # Convert the map of flooded cities to a clean list of names
+    flooded_cities_list = list(best_severity_map.keys())
+    
+    # Return this list so your code can use it
+    return flooded_cities_list

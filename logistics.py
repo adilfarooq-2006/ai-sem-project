@@ -1,5 +1,4 @@
 
-
 #helper function to calculate cargo weight based purely on injured count.
 def calculateDemand(flooded_city_data):
     
@@ -84,7 +83,7 @@ def get_prioritized_fleet(fleet, city_demand):
     4. Helicopters -> Always Last Resort
     """
 
-    required_weight = city_demand["required_weight"]
+    needed_weight = city_demand["needed_weight"]
     road_status = city_demand["road_status"]
 
     # if weight is > 50 it wont be assigned to drones
@@ -104,7 +103,7 @@ def get_prioritized_fleet(fleet, city_demand):
         
         # constraint 2 : heavy load & more injured and roads OPEN
         # Preference: Truck (1) -> Drone (2) -> Heli (3)
-        if required_weight > HEAVY_LOAD and road_status == "Open":
+        if needed_weight > HEAVY_LOAD and road_status == "Open":
             
             if vehicle_type == "truck":
                 return 1
@@ -114,7 +113,7 @@ def get_prioritized_fleet(fleet, city_demand):
                 return 3
             
         # constraint heavy load & road == BLOCKED
-        if required_weight > HEAVY_LOAD and road_status == "Blocked":
+        if needed_weight > HEAVY_LOAD and road_status == "Blocked":
             if vehicle_type == "drone":
                 return 1
             if vehicle_type == "heli":
@@ -149,13 +148,13 @@ def assign_resources(flooded_cities_list):
     assignments = {} #format: { "CityName": ["Truck-1", "Drone-2"] }
 
     #sort cities by priority
-    prioority_queue = sorted(
+    priority_queue = sorted(
         [calculateDemand(c) for c in flooded_cities_list],
         key=lambda x: x['injured_count'], 
         reverse=True
     )
 
-    for city in prioority_queue:
+    for city in priority_queue:
         city_name = city["city_name"]
         needed_weight = city["needed_weight"]
 
@@ -190,10 +189,6 @@ def assign_resources(flooded_cities_list):
         # if cargo is still more and available vehiocles are all routed
         if needed_weight > 0:
             print(f"  -> WARNING: {city_name} still needs {needed_weight}kg. Fleet exhausted!")
+    
     return assignments
-
-
-
-
-
 
