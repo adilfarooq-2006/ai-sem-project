@@ -191,4 +191,3 @@ def assign_resources(flooded_cities_list):
             print(f"  -> WARNING: {city_name} still needs {needed_weight}kg. Fleet exhausted!")
     
     return assignments
-
