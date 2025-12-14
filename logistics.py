@@ -29,27 +29,27 @@ def initializeFleet():
         fleet.append({
             "id": f"Truck-{i}",
             "type": "truck",
-            "capaflooded_city_data": 2500,  # kg (Example High Cap)
+            "capacity": 2500,  # kg (Example High Cap)
             "speed": "slow",
             "available": True
         })
     
-    # 15 truck
-    for i in range (1, 11):
+    # 15 drone
+    for i in range (1, 16):
         fleet.append({
             "id": f"Drone-{i}",
             "type": "drone",
-            "capaflooded_city_data": 50,  # kg
+            "capacity": 50,  # kg
             "speed": "fast",
             "available": True
         })
     
     # 2 heli
-    for i in range (1, 11):
+    for i in range (1, 3):
         fleet.append({
             "id": f"Helicopter-{i}",
-            "type": "drone",
-            "capaflooded_city_data": 20000,  # kg
+            "type": "heli",
+            "capacity": 20000,  # kg
             "speed": "fast",
             "available": True
         })
@@ -64,4 +64,30 @@ def check_vehicle_assignment(vehicle, city_demand):
     Validates if a specific vehicle can handle a specific city's request.
     Returns: True (Valid) or False (Invalid)
     """
+
+    # contraint 1
+    # if vehicle capacity >= cargo weight
+    vehicle_capacity = vehicle.get("capacity", 0) 
+    required_weight = city_demand.get("needed_weight", 0)
+
+    if vehicle_capacity < required_weight:
+        return False
+    
+    # constriant 2
+    # if road is blocked and vehicle is truck
+    isTruck = vehicle.get("type")
+    roadBlocked = city_demand.get("road_status")
+    
+    if isTruck and roadBlocked:
+        return False
+    
+    # if both constraints satisty
+    return True
+
+
+    
+
+
+
+
 
