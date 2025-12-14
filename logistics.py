@@ -58,7 +58,7 @@ def initializeFleet():
 
 
 # Constraints CSP
-def check_vehicle_assignment(vehicle, city_demand):
+def check_valid_for_split_delivery(vehicle, city_demand):
 
     """
     Validates if a specific vehicle can handle a specific city's request.
@@ -139,7 +139,59 @@ def get_prioritized_fleet(fleet, city_demand):
     return sorted(available_vehicles, key=sort_key)
 
 
-    
+def assign_resources(flooded_cities_list):
+    """
+    Allocates multiple vehicles to cities until demand is met.
+    """
+    print("[CSP MANAGER] Starting Dynamic Split Delivery...")
+
+    fleet  = initializeFleet()
+    assignments = {} #format: { "CityName": ["Truck-1", "Drone-2"] }
+
+    #sort cities by priority
+    prioority_queue = sorted(
+        [calculateDemand(c) for c in flooded_cities_list],
+        key=lambda x: x['injured_count'], 
+        reverse=True
+    )
+
+    for city in prioority_queue:
+        city_name = city["city_name"]
+        needed_weight = city["needed_weight"]
+
+        #intialize list for each city
+        assignments[city_name] = []
+
+        # Get prioritized fleet (Trucks -> Drones -> Helis)
+        # We RE-EVALUATE this for every city to check who is still available
+        candidate_vehicles = get_prioritized_fleet(fleet, city)
+        
+        print(f"Processing {city_name}: Needs {needed_weight}kg")
+
+        for vehicle in candidate_vehicles:
+            # Stop if we have fulfilled the demand
+            if needed_weight <= 0:
+                print(f"  -> {city_name} is fully supplied!")
+                break
+
+            # check HARD constraints if passed then start
+            if check_valid_for_split_delivery(vehicle, city):
+
+                # remove availibilty of vehile
+                vehicle["available"] = False
+                assignments[city_name].append(vehicle["id"])
+
+                #subtarct cargp 
+                delivered_amount = min(needed_weight, vehicle["capacity"])
+                needed_weight -= delivered_amount
+
+                print(f"    -> Assigned {vehicle['id']} (Delivers {delivered_amount}kg). Remaining: {needed_weight}kg")
+
+        # if cargo is still more and available vehiocles are all routed
+        if needed_weight > 0:
+            print(f"  -> WARNING: {city_name} still needs {needed_weight}kg. Fleet exhausted!")
+    return assignments
+
 
 
 
