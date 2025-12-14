@@ -47,8 +47,8 @@ def select_best_hub(target_city, cities_data):
     print(f"LOGISTICS: Calculating optimal hub for target: {target_city}...")
     
     for hub in HUBS:
-        dist = calculate_haversine_distance(hub, target_city, cities_data)
-        print(f" - Distance from {hub}: {dist:.4f} units")
+        dist = int(calculate_haversine_distance(hub, target_city, cities_data))
+        print(f" - Distance from {hub}: {dist} km")
         
         if dist < shortest_dist:
             shortest_dist = dist
