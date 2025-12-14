@@ -202,13 +202,33 @@ def mutate_path(path, target_node, graph_data, mutation_rate=0.3):
     return path
 
 
+def crossover_paths(parent_a, parent_b):
+    """
+    Combines two paths if they share a common city (Pivot Point).
+    """
+    # Find common cities (excluding Start and End to avoid trivial swaps)
+    common_nodes = set(parent_a[1:-1]) & set(parent_b[1:-1])
+    
+    if not common_nodes:
+        return None # Parents are too different to breed
+        
+    # Pick a random common city to splice at
+    pivot = random.choice(list(common_nodes))
+    
+    idx_a = parent_a.index(pivot)
+    idx_b = parent_b.index(pivot)
+    
+    # Create Child: Head of Parent A + Tail of Parent B
+    # logic: parent_a[:idx_a] stops BEFORE pivot. parent_b[idx_b:] starts AT pivot.
+    child = parent_a[:idx_a] + parent_b[idx_b:]
+    
+    return child
+
+
 def run_genetic_navigation(start, end, graph_data, generations=100, pop_size=20):
     # 1. INITIALIZE
     population = create_initial_population(start, end, graph_data, pop_size)
-    
-    if not population:
-        print("[GA FAILED] Could not generate any valid paths.")
-        return None
+    if not population: return None
 
     best_global_path = None
     best_global_score = -1
@@ -216,40 +236,57 @@ def run_genetic_navigation(start, end, graph_data, generations=100, pop_size=20)
     print(f"[GA STARTED] Evolving routes from {start} to {end}...")
 
     for gen in range(generations):
-        # 2. EVALUATE (Calculate Fitness for all)
-        # Create a list of tuples: (score, path)
+        # 2. EVALUATE
         scored_pop = []
+        unique_paths = set() # To filter duplicates
+        
         for p in population:
+            # Convert list to tuple to make it hashable for set check
+            p_tuple = tuple(p)
+            if p_tuple in unique_paths:
+                continue
+            unique_paths.add(p_tuple)
+            
             score = calculate_fitness(p, graph_data)
             scored_pop.append((score, p))
         
-        # Sort: High score first
+        # If population died out (all invalid), break
+        if not scored_pop: break
+
         scored_pop.sort(key=lambda x: x[0], reverse=True)
         
-        # Track Best
-        current_best_score, current_best_path = scored_pop[0]
-        if current_best_score > best_global_score:
-            best_global_score = current_best_score
-            best_global_path = current_best_path
+        # Update Best
+        if scored_pop[0][0] > best_global_score:
+            best_global_score = scored_pop[0][0]
+            best_global_path = scored_pop[0][1]
 
-        current_gen = gen + 1
-        if current_gen in [1, 50, 100]:
-            print(f"\n[GEN {current_gen}] Best Score: {best_global_score:.2f}")
+        # Log Progress
+        if (gen + 1) in [1, 50, 100]:
+            print(f"\n[GEN {gen+1}] Best Score: {best_global_score:.2f}")
             print(f"Path: {best_global_path}")
-            
-        # 3. SELECTION (Survival of the Fittest)
-        # Keep top 50% (Elitism)
-        survivors = scored_pop[:pop_size // 2]
+
+        # 3. SELECTION (Elitism)
+        # Keep top 20% guaranteed, breed the rest
+        elite_count = int(pop_size * 0.2)
+        survivors = [s[1] for s in scored_pop[:elite_count]]
         
-        # 4. REPOPULATE (Breeding/Mutation)
-        new_population = [s[1] for s in survivors] # Keep the parents
+        # 4. REPOPULATE (Crossover & Mutation)
+        new_population = survivors[:] # Start with elites
         
         while len(new_population) < pop_size:
-            # Pick a random parent from survivors to clone & mutate
-            parent = random.choice(survivors)[1]
-            
-            # Create Child via Mutation
-            child = mutate_path(parent, end, graph_data)
+            # 80% chance to Breed, 20% chance to Mutate randomly
+            if random.random() < 0.8 and len(survivors) > 1:
+                parent_a = random.choice(survivors)
+                parent_b = random.choice(survivors)
+                child = crossover_paths(parent_a, parent_b)
+                
+                # If crossover failed (no common cities), fall back to mutation
+                if not child:
+                    child = mutate_path(parent_a, end, graph_data)
+            else:
+                parent = random.choice(survivors)
+                child = mutate_path(parent, end, graph_data)
+                
             new_population.append(child)
             
         population = new_population
