@@ -1,7 +1,7 @@
 # helper function to calculate cargo weight based purely on injured count.
 def calculateDemand(flooded_city_data):
     injured_count = flooded_city_data.get("injured_count", 0)
-    SUPPLY_PER_PERSON = 5
+    SUPPLY_PER_PERSON = 2
     needed_weight = injured_count * SUPPLY_PER_PERSON
 
     return {

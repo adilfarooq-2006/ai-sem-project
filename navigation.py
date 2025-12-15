@@ -37,6 +37,19 @@ def calculate_haversine_distance(city_a_name, city_b_name, cities_data):
     return round(distance_km, 2)
 
 
+def calculate_path_distance_only(path, graph_data):
+    """
+    Helper: Calculates pure distance of a path (ignoring risk).
+    """
+    total_dist = 0
+    for i in range(len(path) - 1):
+        try:
+            total_dist += graph_data[path[i]]['neighbors'][path[i+1]]
+        except KeyError:
+            return 9999
+    return total_dist
+
+
 def select_best_hub(target_city, cities_data):
     """
     Decides whether to dispatch from Lahore or Islamabad.
@@ -105,30 +118,50 @@ def get_random_valid_path(start_node, target_node, graph_data, max_attempts=100)
                 
     return None # Failed to find a path after many tries
 
-def create_initial_population(start_node, target_node, graph_data, pop_size=20):
-    """
-    Generates a list of random valid paths.
-    """
+# def create_initial_population(start_node, target_node, graph_data, pop_size=20):
+#     """
+#     Generates a list of random valid paths.
+#     """
+#     population = []
+#     attempts = 0
+    
+#     print(f"[GA] Searching for {pop_size} unique paths from {start_node} to {target_node}...")
+    
+#     while len(population) < pop_size:
+#         # Try to generate a path
+#         path = get_random_valid_path(start_node, target_node, graph_data)
+        
+#         if path:
+#             # OPTIONAL: Avoid exact duplicates in the population
+#             if path not in population:
+#                 population.append(path)
+        
+#         # Safety break to prevent infinite loops if paths are impossible
+#         attempts += 1
+#         if attempts > pop_size * 10:
+#             print(f"[WARNING]: Only found {len(population)} possible paths.")
+#             break
+            
+#     return population
+
+def create_initial_population(start_node, target_node, graph_data, pop_size):
     population = []
     attempts = 0
     
     print(f"[GA] Searching for {pop_size} unique paths from {start_node} to {target_node}...")
-    
-    while len(population) < pop_size:
-        # Try to generate a path
+
+    # Limit attempts to prevent infinite loops
+    while len(population) < pop_size and attempts < 200:
         path = get_random_valid_path(start_node, target_node, graph_data)
         
         if path:
-            # OPTIONAL: Avoid exact duplicates in the population
+            # CHECK IF PATH IS ALREADY IN POPULATION
             if path not in population:
                 population.append(path)
         
-        # Safety break to prevent infinite loops if paths are impossible
         attempts += 1
-        if attempts > pop_size * 10:
-            print(f"[WARNING]: Only found {len(population)} possible paths.")
-            break
             
+    print(f"[GA] Initialized with {len(population)} unique paths.")
     return population
 
 
@@ -234,7 +267,7 @@ def crossover_paths(parent_a, parent_b):
     return child
 
 
-def run_genetic_navigation(start, end, graph_data, generations=100, pop_size=20):
+def run_genetic_navigation(start, end, graph_data, generations=100, pop_size=50):
     # ---------------------------------------------------------
     # 0. HANDLE SAME CITY CASE
     # ---------------------------------------------------------
@@ -276,10 +309,13 @@ def run_genetic_navigation(start, end, graph_data, generations=100, pop_size=20)
             best_global_score = scored_pop[0][0]
             best_global_path = scored_pop[0][1]
 
-        # Log Progress
-        if (gen + 1) in [1, 50, 100]:
-            print(f"\n[GEN {gen+1}] Best Score: {best_global_score:.2f}")
-            print(f"Path: {best_global_path}")
+        # Log Progress (Updated to show Distance)
+        if (gen + 1) in [1, 50, 100] or (gen + 1) == generations:
+            # Calculate actual distance for the log
+            dist = calculate_path_distance_only(best_global_path, graph_data)
+            
+            tag = "[OPTIMAL]" if (gen + 1) == generations else ""
+            print(f" -> Generation {gen+1}: Distance {dist}km {tag}")
 
         # 3. SELECTION (Elitism)
         # Keep top 20% guaranteed, breed the rest
