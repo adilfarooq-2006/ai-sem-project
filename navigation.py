@@ -126,7 +126,7 @@ def create_initial_population(start_node, target_node, graph_data, pop_size=20):
         # Safety break to prevent infinite loops if paths are impossible
         attempts += 1
         if attempts > pop_size * 10:
-            print(f"Warning: Only found {len(population)} paths (Graph might be disconnected or too small).")
+            print(f"[WARNING]: Only found {len(population)} possible paths.")
             break
             
     return population
@@ -235,6 +235,13 @@ def crossover_paths(parent_a, parent_b):
 
 
 def run_genetic_navigation(start, end, graph_data, generations=100, pop_size=20):
+    # ---------------------------------------------------------
+    # 0. HANDLE SAME CITY CASE
+    # ---------------------------------------------------------
+    if start == end:
+        print(f"[NAV]: Target is the Hub itself ({start}). Initiating local delivery protocol.")
+        return [start]
+    
     # 1. INITIALIZE
     population = create_initial_population(start, end, graph_data, pop_size)
     if not population: return None

@@ -7,34 +7,38 @@ from dataset import punjab_cities
 # ==========================================
 # HELPER FUNCTIONS
 # ==========================================
-def print_header(title):
-    print("\n" + "█" * 60)
-    print(f"█  {title.center(54)}  █")
-    print("█" * 60 + "\n")
-
-def print_separator():
-    print("-" * 60)
-
-def prepare_data_for_logistics(active_data, priority_queue):
-    flooded_list = []
-    critical_city_names = [item[0] for item in priority_queue]
-    for city_name in critical_city_names:
-        city_data = active_data[city_name]
-        logistics_entry = city_data.copy()
-        logistics_entry["name"] = city_name
-        if "coords" not in logistics_entry:
-            logistics_entry["coords"] = [0, 0] 
-        flooded_list.append(logistics_entry)
-    return flooded_list
 
 def get_critical_priority_queue(active_data):
+    """
+    Returns a list of tuples: (city_name, priority_score)
+    Sorted by urgency (highest first).
+    """
     queue = []
     for city_name, data in active_data.items():
+        # Filter for cities that are flooded OR have injuries
         if data.get('flood_status') is True or data.get('injured_count', 0) > 0:
             p_score = data.get('priority_score', 0)
             queue.append((city_name, p_score))
+            
+    # Sort descending by score
     queue.sort(key=lambda x: x[1], reverse=True)
     return queue
+
+def prepare_single_city_for_logistics(city_name, active_data):
+    """
+    Formats a single city's data into a list containing one dictionary,
+    matching the input format expected by logistics.assign_resources()
+    """
+    city_data = active_data[city_name]
+    logistics_entry = city_data.copy()
+    logistics_entry["name"] = city_name
+    
+    # Ensure coords exist (fallback if missing)
+    if "coords" not in logistics_entry:
+        logistics_entry["coords"] = (0, 0)
+        
+    # Return as a list because assign_resources expects a list
+    return [logistics_entry]
 
 # ==========================================
 # CORE LOGIC: EXECUTION
@@ -44,72 +48,70 @@ def execute_rescue_operations(active_data):
     priority_queue = get_critical_priority_queue(active_data)
 
     if not priority_queue:
-        print(" [STATUS] No critical zones found. Simulation needed?")
+        print("[STATUS]: No critical zones found. Please run the Flood Simulation first (Option 1).")
         return
 
-    print_header("INITIALIZING RESCUE COMMAND")
-    print(" [SYSTEM] Allocating Global Fleet Resources (CSP)...")
-    
-    # --- HIDDEN STEP: CALCULATE LOGISTICS FIRST ---
-    # We do this now to reserve trucks, but we won't show the user yet.
-    flooded_list = prepare_data_for_logistics(active_data, priority_queue)
-    mission_logs = logistics.assign_resources(flooded_list)
-    print(" [SYSTEM] Resources Allocated. Starting Missions...")
+    print("\n[SYSTEM]: INITIALIZING RESCUE COMMAND...")
+    print(f"[SYSTEM]: {len(priority_queue)} Critical Zones Identified.")
+    print("[SYSTEM]: Starting Sequential Missions...")
+    print("="*60)
 
-    # --- VISIBLE STEP: RESCUE MISSIONS ---
     mission_id = 1
     
+    # EXECUTE SEQUENTIAL MISSIONS
     for target_city, urgency_score in priority_queue:
-        print_header(f"MISSION #{mission_id}: {target_city.upper()}")
-        print(f" URGENCY: {urgency_score:.2f}")
 
-        # STEP 1: NAVIGATION (RESCUE TEAM GOES FIRST)
+        print(f"\nMISSION #{mission_id}: {target_city.upper()}")
+        print(f" URGENCY SCORE: {urgency_score}")
+        print("-" * 40)
+
+        # ----------------------------------------
+        # PHASE A: NAVIGATION (Find the Path)
+        # ----------------------------------------
         start_hub = navigation.select_best_hub(target_city, active_data)
         
         if start_hub:
-            print(f" [NAV] Dispatching from Hub: {start_hub}")
-            print(" [NAV] Calculating Route (Genetic Algorithm)...")
-            best_route = navigation.run_genetic_navigation(start_hub, target_city, active_data)
+            print(f"[NAV]: Calculating Route (Genetic Algorithm)...")
+            
+            # Run GA
+            best_route = navigation.run_genetic_navigation(
+                start_hub, 
+                target_city, 
+                active_data, 
+            )
             
             if best_route:
-                print(f" [NAV] 🟢 ROUTE CONFIRMED: {' -> '.join(best_route)}")
+                print("[NAV]: ROUTE FOUND!")
+                path_str = " -> ".join(best_route)
+                print(f"[NAV]: Best Route out of 100 generations: {path_str}")
             else:
-                print(f" [NAV] 🔴 FAILED: City Isolated (Roads Blocked)")
+                print(f"[ERROR]: NO ROUTE FOUND!")
         else:
-            print(" [NAV] 🔴 ERROR: No Hub Available")
+            print("[ERROR]: No Hub Available (Check dataset)")
 
-        print_separator()
+        print("-" * 40)
 
-        # STEP 2: LOGISTICS (SUPPLIES ARRIVE AFTER ROUTE IS FOUND)
-        print(" [LOGISTICS] Deploying Supply Chain...")
+        # ----------------------------------------
+        # PHASE B: LOGISTICS (Deliver Supplies)
+        # ----------------------------------------
+        # We invoke the Logistics module directly here.
+        # It will calculate needs and PRINT the vehicle assignments immediately.
         
-        city_log = mission_logs.get(target_city)
+        formatted_city_list = prepare_single_city_for_logistics(target_city, active_data)
         
-        if city_log:
-            demand = city_log['total_demand']
-            print(f" [LOGISTICS] Total Demand: {demand}kg")
-            
-            # Show the vehicles arriving
-            if city_log["vehicles"]:
-                for v in city_log["vehicles"]:
-                    print(f"    -> 🚛 Arrived: {v['id']} | Cargo: {v['cargo']}kg")
-            else:
-                print("    -> ⚠️ NO VEHICLES AVAILABLE (Fleet Exhausted or Road Blocked)")
-                
-            remaining = city_log['remaining_demand']
-            if remaining > 0:
-                print(f" [STATUS] ⚠️ PARTIAL FULFILLMENT. Deficit: {remaining}kg")
-            else:
-                print(f" [STATUS] ✅ SUPPLY CHAIN COMPLETE.")
+        # This function prints its own output (No return value used)
+        logistics.assign_resources(formatted_city_list)
         
+        print("="*60)
         mission_id += 1
 
-    print("\n [INFO] All Missions Completed.")
+    print("\n[INFO] All Missions Completed.")
 
 # ==========================================
 # MAIN MENU
 # ==========================================
 def main():
+    # Load Initial Data
     active_data = simulation.initialize_simulation_data(punjab_cities)
     
     while True:
@@ -126,28 +128,42 @@ def main():
         choice = input("\nSelect Option [1-5]: ").strip()
 
         if choice == '1':
-            target = input(" Enter Start City Name: ").strip().title()
+            target = input("Enter Start City Name (e.g. Lahore, Sialkot, Rawalpindi): ").strip().title()
             if target in active_data:
                 simulation.run_flood_simulation(target, active_data)
             else:
-                print(f"\n [ERROR] '{target}' not found.")
+                print(f"\n[ERROR]: '{target}' not found in dataset.")
 
         elif choice == '2':
             queue = get_critical_priority_queue(active_data)
-            print(f"\n {'CITY':<20} | {'PRIORITY':<10}")
-            print("-" * 35)
-            for city, score in queue:
-                print(f" {city:<20} | {score:<10.2f}")
+
+            if not queue:
+                print("\n[INFO]: No active alerts. Run simulation first.")
+            else:
+                # 1. Update Header to include Road Status
+                print(f"\n {'CITY':<20} | {'PRIORITY':<10} | {'ROAD STATUS':<12}")
+                print("-" * 50)
+                
+                for city, score in queue:
+                    # 2. Retrieve status from the main dataset
+                    status = active_data[city].get('road_status', 'Unknown')
+                    
+                    # 3. Print with alignment
+                    print(f" {city:<20} | {score:<10} | {status:<12}")
 
         elif choice == '3':
             execute_rescue_operations(active_data)
 
         elif choice == '4':
             active_data = simulation.initialize_simulation_data(punjab_cities)
-            print(" [SYSTEM] Reset Complete.")
+            print("[SYSTEM]: Simulation Data Reset.")
 
         elif choice == '5':
+            print("[SYSTEM]: Shutting down...")
             break
+        
+        else:
+            print("Invalid Selection.")
 
 if __name__ == "__main__":
     main()
