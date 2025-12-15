@@ -2,6 +2,7 @@
 import simulation       # Flood Simulation Module
 import logistics        # CSP Logistics Module (Updated)
 import navigation       # Genetic Algorithm Module
+import visualization    # Generate MAP
 from dataset import punjab_cities 
 
 # ==========================================
@@ -81,11 +82,20 @@ def execute_rescue_operations(active_data):
             )
             
             if best_route:
-                print("[NAV]: ROUTE FOUND!")
                 path_str = " -> ".join(best_route)
-                print(f"[NAV]: Best Route out of 100 generations: {path_str}")
+                print(f"[NAV] ROUTE CONFIRMED: {path_str}")
+                
+                # === TRIGGER VISUALIZATION HERE ===
+                print("[VISUALIZATION] Generating Mission Map...")
+                visualization.generate_mission_map(
+                    active_data, 
+                    path=best_route, 
+                    filename=f"mission_{target_city}.html"
+                )
+                # ==================================
+                
             else:
-                print(f"[ERROR]: NO ROUTE FOUND!")
+                print(f"[NAV] FAILED: City Isolated")
         else:
             print("[ERROR]: No Hub Available (Check dataset)")
 
