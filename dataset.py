@@ -1113,7 +1113,7 @@ punjab_cities = {
         "coords": (31.8258, 72.5406),
         "elevation": 175,
         "population": 38000,
-        "neighbors": {"Sargodha": 35, "Faruka": 20, "Lalian": 30}
+        "neighbors": {"Sargodha": 5, "Faruka": 20, "Lalian": 30}
     },
     "Sodhra": {
         "coords": (32.4833, 74.1833),
