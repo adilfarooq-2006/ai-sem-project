@@ -5,9 +5,9 @@ import visualization  # Map Generation
 from dataset import punjab_cities
 
 
-# ==========================================
+# =========================================
 # PROLOG-STYLE LOGIC ENGINE (XAI)
-# ==========================================
+# =========================================
 class DisasterLogicEngine:
     def __init__(self):
         # High-level "Knowledge Base" Facts
@@ -134,6 +134,7 @@ def execute_rescue_operations(active_data):
         print("=" * 60)
 
     print("\n[INFO] All Hybrid Missions Completed. Check 'maps' folder for results.")
+    simulation.initialize_simulation_data(punjab_cities)
 
 
 # ==========================================
