@@ -344,3 +344,15 @@ def run_genetic_navigation(start, end, graph_data, generations=100, pop_size=50)
         population = new_population
 
     return best_global_path
+
+def get_aerial_mission_path(start_city, target_city):
+    """
+    Bypasses road networks.
+    Returns the direct 'Flight Path' using only start and end points.
+    """
+    # This tells the visualization to draw a line directly
+    # from the Hub to the Mission Target.
+    return [start_city, target_city]
+
+# Add this at the end of navigation.py
+calculate_distance = calculate_haversine_distance
