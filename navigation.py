@@ -353,3 +353,6 @@ def get_aerial_mission_path(start_city, target_city):
     # This tells the visualization to draw a line directly
     # from the Hub to the Mission Target.
     return [start_city, target_city]
+
+# Add this at the end of navigation.py
+calculate_distance = calculate_haversine_distance

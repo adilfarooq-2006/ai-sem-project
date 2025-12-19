@@ -1,8 +1,38 @@
 import simulation  # Flood Simulation Module
-import logistics  # CSP Logistics Module (Swarm Updated)
+import logistics  # CSP Logistics Module (Swarm & Weight Threshold)
 import navigation  # Genetic Algorithm / Aerial Module
 import visualization  # Map Generation
 from dataset import punjab_cities
+
+
+# ==========================================
+# PROLOG-STYLE LOGIC ENGINE (XAI)
+# ==========================================
+class DisasterLogicEngine:
+    def __init__(self):
+        # High-level "Knowledge Base" Facts
+        self.SWARM_THRESHOLD = 2500  # Heli vs Drone limit
+
+    def get_xai_log(self, vehicle, weight, road_status, distance):
+        """
+        Mimics Prolog's Traceability. Explains WHY a vehicle was chosen.
+        """
+        # Data Normalization for the Log
+        facts = f"Facts: Weight={weight}kg, Road={road_status}, Dist={round(distance, 1)}km"
+
+        if road_status == "Blocked":
+            if weight > self.SWARM_THRESHOLD:
+                reason = f"Decision: HELICOPTER. Logic: weight({weight}) > limit({self.SWARM_THRESHOLD}) AND road(Blocked). Rule 'Heavy_Lift_Protocol' triggered."
+            else:
+                reason = f"Decision: DRONE SWARM. Logic: weight({weight}) <= limit({self.SWARM_THRESHOLD}) AND road(Blocked). Rule 'Aerial_Swarm_Efficiency' triggered."
+        else:
+            reason = f"Decision: TRUCK CONVOY. Logic: road(Open). Rule 'Ground_Priority' triggered. Ground travel is most cost-effective."
+
+        return f"\n[XAI REASONING LOG]\n{facts}\n{reason}"
+
+
+# Create the global engine instance
+logic_engine = DisasterLogicEngine()
 
 
 # ==========================================
@@ -23,13 +53,11 @@ def prepare_single_city_for_logistics(city_name, active_data):
     city_data = active_data[city_name]
     logistics_entry = city_data.copy()
     logistics_entry["name"] = city_name
-    if "coords" not in logistics_entry:
-        logistics_entry["coords"] = (31.5204, 74.3587)  # Fallback to Lahore coords
     return [logistics_entry]
 
 
 # ==========================================
-# CORE LOGIC: HYBRID EXECUTION
+# CORE LOGIC: HYBRID EXECUTION WITH XAI
 # ==========================================
 
 def execute_rescue_operations(active_data):
@@ -39,52 +67,63 @@ def execute_rescue_operations(active_data):
         print("[STATUS]: No critical zones found. Please run Simulation first.")
         return
 
-    print("\n[SYSTEM]: INITIALIZING HYBRID RESCUE COMMAND...")
-    print(f"[SYSTEM]: {len(priority_queue)} Critical Zones Identified.")
+    print("\n[SYSTEM]: INITIALIZING HYBRID RESCUE COMMAND (XAI ENABLED)...")
+    print(f"[SYSTEM]: {len(priority_queue)} Missions queued.")
     print("=" * 60)
 
-    mission_id = 1
-
-    for target_city, urgency_score in priority_queue:
+    for mission_id, (target_city, urgency_score) in enumerate(priority_queue, 1):
         print(f"\nMISSION #{mission_id}: {target_city.upper()}")
         print("-" * 40)
 
         # 1. SELECT HUB
         start_hub = navigation.select_best_hub(target_city, active_data)
-        if not start_hub:
-            print("[ERROR]: No start hub found.")
-            continue
 
-        # 2. HYBRID NAVIGATION LOGIC (The Fix)
-        # Check road status to decide if we fly (Direct) or drive (GA)
+        # 2. HYBRID NAVIGATION LOGIC
         road_status = active_data[target_city].get('road_status', 'Open')
         best_route = None
 
         if road_status == "Blocked":
-            # AIR LOGIC: Point-to-Point displacement (Haversine Path)
             print(f"[NAV]: Road Blocked. Aerial Mission Confirmed.")
-            print(f"[NAV]: Bypassing road network for direct flight to {target_city}...")
-            # We simply return the start and end city as the "path"
             best_route = [start_hub, target_city]
         else:
-            # GROUND LOGIC: Must navigate open roads using GA
             print(f"[NAV]: Road Open. Ground Mission via Genetic Algorithm...")
             best_route = navigation.run_genetic_navigation(start_hub, target_city, active_data)
 
-        if best_route:
-            print(f"[NAV] ROUTE CONFIRMED: {' -> '.join(best_route)}")
-        else:
-            print(f"[NAV] FAILED: Target Isolated")
-
-        print("-" * 40)
-
-        # 3. LOGISTICS (Deliver Supplies - Swarm Updated)
+        # 3. LOGISTICS (Deliver Supplies)
         formatted_city_list = prepare_single_city_for_logistics(target_city, active_data)
         mission_assignments = logistics.assign_resources(formatted_city_list)
 
-        # 4. VISUALIZATION (Generate Map with dynamic colors)
+        # --- XAI LOGIC: SYNC WEIGHT DATA ---
+        # We extract the weight that was actually assigned to the vehicles
+        total_weight = 0
+        lead_vehicle = "truck"
+
+        for assignment in mission_assignments:
+            if "Helicopter" in assignment:
+                lead_vehicle = "heli"
+            elif "Drone" in assignment:
+                lead_vehicle = "drone"
+
+            # Extract number between '(' and 'kg)'
+            if '(' in assignment and 'kg' in assignment:
+                try:
+                    w_val = assignment.split('(')[1].split('kg')[0]
+                    total_weight += int(w_val)
+                except:
+                    pass
+
+        dist = navigation.calculate_distance(start_hub, target_city, active_data)
+        reasoning = logic_engine.get_xai_log(lead_vehicle, total_weight, road_status, dist)
+
+        # Output results to console
+        print(f"CITY: {target_city} | Status: Fulfilled")
+        print(f"Assigned: {', '.join(mission_assignments)}")
+        print(reasoning)
+        # -----------------------------------
+
+        # 4. VISUALIZATION
         if best_route:
-            print("[VISUALIZATION] Generating Mission Map...")
+            print(f"[VISUALIZATION] Generating Mission Map...")
             visualization.generate_mission_map(
                 active_data,
                 path=best_route,
@@ -93,9 +132,8 @@ def execute_rescue_operations(active_data):
             )
 
         print("=" * 60)
-        mission_id += 1
 
-    print("\n[INFO] All Hybrid Missions Completed.")
+    print("\n[INFO] All Hybrid Missions Completed. Check 'maps' folder for results.")
 
 
 # ==========================================
@@ -108,15 +146,15 @@ def main():
         print(" AI DISASTER RESPONSE SYSTEM - COMMAND CENTER")
         print("=" * 60)
         print(" 1. [SIMULATION] Trigger Flood Event")
-        print(" 2. [REPORT]     View Critical Priority Queue")
-        print(" 3. [ACTION]     Execute Rescue Missions")
-        print(" 4. [SYSTEM]     Reset Simulation Data")
+        print(" 2. [REPORT]     View Priority Queue")
+        print(" 3. [ACTION]     Execute Missions (Hybrid + XAI)")
+        print(" 4. [SYSTEM]     Reset Data")
         print(" 5. [SYSTEM]     Exit")
         print("=" * 60)
 
         choice = input("\nSelect Option [1-5]: ").strip()
         if choice == '1':
-            target = input("Enter Start City Name: ").strip().title()
+            target = input("Enter Start City: ").strip().title()
             if target in active_data:
                 simulation.run_flood_simulation(target, active_data)
             else:
@@ -130,16 +168,15 @@ def main():
                 print("-" * 50)
                 for city, score in queue:
                     status = active_data[city].get('road_status', 'Unknown')
-                    print(f" {city:<20} | {score:<10} | {status:<12}")
+                    print(f" {city:<20} | {score:<10.2f} | {status}")
         elif choice == '3':
             execute_rescue_operations(active_data)
         elif choice == '4':
             active_data = simulation.initialize_simulation_data(punjab_cities)
-            print("[SYSTEM]: Data Reset.")
+            print("[SYSTEM]: Simulation Data Reset.")
         elif choice == '5':
+            print("[SYSTEM]: Shutting down Command Center. Goodbye.")
             break
-        else:
-            print("Invalid Selection.")
 
 
 if __name__ == "__main__":
