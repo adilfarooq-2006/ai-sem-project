@@ -5,9 +5,9 @@ import visualization  # Map Generation
 from dataset import punjab_cities
 
 
-# ==========================================
+# =========================================
 # PROLOG-STYLE LOGIC ENGINE (XAI)
-# ==========================================
+# =========================================
 class DisasterLogicEngine:
     def __init__(self):
         # High-level "Knowledge Base" Facts
@@ -115,9 +115,9 @@ def execute_rescue_operations(active_data):
         dist = navigation.calculate_distance(start_hub, target_city, active_data)
         reasoning = logic_engine.get_xai_log(lead_vehicle, total_weight, road_status, dist)
 
-        # Output results to console
-        print(f"CITY: {target_city} | Status: Fulfilled")
-        print(f"Assigned: {', '.join(mission_assignments)}")
+        # # Output results to console
+        # print(f"CITY: {target_city} | Status: Fulfilled")
+        # print(f"Assigned: {', '.join(mission_assignments)}")
         print(reasoning)
         # -----------------------------------
 
@@ -133,7 +133,18 @@ def execute_rescue_operations(active_data):
 
         print("=" * 60)
 
-    print("\n[INFO] All Hybrid Missions Completed. Check 'maps' folder for results.")
+        # We assume active_data structure holds the urgency. 
+        # By setting it to 0, it is no longer "Critical".
+        if target_city in active_data:
+            active_data[target_city]['urgency'] = 0 
+            active_data[target_city]['status'] = 'Safe' # Optional flag
+            active_data[target_city]['injured_count'] = 0
+            # ==========================================================
+
+    print("=" * 60)
+    print("\n[INFO] All Hybrid Missions Completed. Queue reset.")
+    print("[INFO] Active Data updated: Critical zones marked as Safe.")
+    
 
 
 # ==========================================

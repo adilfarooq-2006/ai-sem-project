@@ -28,7 +28,7 @@ class DisasterLogicEngine:
         return True, f"LOGIC_CONFIRMED: {vehicle_type.upper()} satisfies weight, road, and range constraints."
 
     def get_xai_log(self, mission_data):
-        """Generates the 'Reasoning Log' for the Viva."""
+        """Generates the 'Reasoning Log'"""
         success, explanation = self.verify_mission(
             mission_data['vehicle'],
             mission_data['weight'],

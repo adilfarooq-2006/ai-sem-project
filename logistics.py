@@ -101,10 +101,13 @@ def assign_resources(flooded_cities_list):
             emergency_counter += 1
             delivered = min(needed_weight, ev["capacity"])
             needed_weight -= delivered
-            
-            assigned_vehicles_log.append(f"EMERGENCY: {emergency_vehicle['id']} ({delivered}kg)")
+            assigned_vehicles_log.append(f"EMERGENCY: {ev['id']} ({delivered}kg)")
 
         all_mission_assignments.extend(assigned_vehicles_log)
-        print(f"CITY: {city['city_name'].upper()} | Status: Fulfilled | Assigned: {', '.join(assigned_vehicles_log)}")
+        print(f"\nCITY: {city['city_name']} | Status: Fulfilled")
+        print("Assigned:")
+        for vehicle in assigned_vehicles_log:
+            print(f"   - {vehicle}")
+        print("-" * 40) # Adds a separator line
 
     return all_mission_assignments
