@@ -6,7 +6,7 @@ from dataset import punjab_cities
 
 
 # =========================================
-# PROLOG-STYLE LOGIC ENGINE (XAI)
+# PROLOG LOGIC ENGINE (XAI)
 # =========================================
 class DisasterLogicEngine:
     def __init__(self):
@@ -18,15 +18,15 @@ class DisasterLogicEngine:
         Mimics Prolog's Traceability. Explains WHY a vehicle was chosen.
         """
         # Data Normalization for the Log
-        facts = f"Facts: Weight={weight}kg, Road={road_status}, Dist={round(distance, 1)}km"
+        facts = f"Facts: Weight={weight}k | Road = {road_status} |  Distance = {round(distance, 1)} km"
 
         if road_status == "Blocked":
             if weight > self.SWARM_THRESHOLD:
-                reason = f"Decision: HELICOPTER. Logic: weight({weight}) > limit({self.SWARM_THRESHOLD}) AND road(Blocked). Rule 'Heavy_Lift_Protocol' triggered."
+                reason = f"Decision: HELICOPTER | Logic: weight({weight}) > limit({self.SWARM_THRESHOLD}) AND road(Blocked) | Rule 'Heavy_Lift_Protocol' triggered."
             else:
-                reason = f"Decision: DRONE SWARM. Logic: weight({weight}) <= limit({self.SWARM_THRESHOLD}) AND road(Blocked). Rule 'Aerial_Swarm_Efficiency' triggered."
+                reason = f"Decision: DRONE SWARM | Logic: weight({weight}) <= limit({self.SWARM_THRESHOLD}) AND road(Blocked) | Rule 'Aerial_Swarm_Efficiency' triggered."
         else:
-            reason = f"Decision: TRUCK CONVOY. Logic: road(Open). Rule 'Ground_Priority' triggered. Ground travel is most cost-effective."
+            reason = f"Decision: TRUCK CONVOY | Logic: road(Open). Rule 'Ground_Priority' triggered | Ground travel is most cost-effective."
 
         return f"\n[XAI REASONING LOG]\n{facts}\n{reason}"
 
@@ -67,7 +67,7 @@ def execute_rescue_operations(active_data):
         print("[STATUS]: No critical zones found. Please run Simulation first.")
         return
 
-    print("\n[SYSTEM]: INITIALIZING HYBRID RESCUE COMMAND (XAI ENABLED)...")
+    print("\n[SYSTEM]: INITIALIZING HYBRID RESCUE COMMAND")
     print(f"[SYSTEM]: {len(priority_queue)} Missions queued.")
     print("=" * 60)
 
@@ -83,10 +83,10 @@ def execute_rescue_operations(active_data):
         best_route = None
 
         if road_status == "Blocked":
-            print(f"[NAV]: Road Blocked. Aerial Mission Confirmed.")
+            print(f"[NAV]: Roads Blocked. Aerial Mission Confirmed.")
             best_route = [start_hub, target_city]
         else:
-            print(f"[NAV]: Road Open. Ground Mission via Genetic Algorithm...")
+            print(f"[NAV]: Roads Open. Ground Mission via Genetic Algorithm...")
             best_route = navigation.run_genetic_navigation(start_hub, target_city, active_data)
 
         # 3. LOGISTICS (Deliver Supplies)
