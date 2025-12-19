@@ -128,7 +128,7 @@ def assign_resources(flooded_cities_list):
             delivered = min(needed_weight, emergency_vehicle["capacity"])
             needed_weight -= delivered
             
-            assigned_vehicles_log.append(f"EMERGENCY: {emergency_vehicle['id']} ({delivered}kg)")
+            assigned_vehicles_log.append(f"EMERGENCY: {emergency_vehicle['id']} ({delivered}kg)") 
 
         # 3. Print Logs Immediately
         status = "Fulfilled" if needed_weight <= 0 else "Partial/Failed"
