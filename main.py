@@ -135,13 +135,9 @@ def execute_rescue_operations(active_data):
 
         # We assume active_data structure holds the urgency. 
         # By setting it to 0, it is no longer "Critical".
-        if target_city in active_data:
-            active_data[target_city]['urgency'] = 0 
-            active_data[target_city]['status'] = 'Safe' # Optional flag
-            active_data[target_city]['injured_count'] = 0
-            # ==========================================================
 
     print("=" * 60)
+    active_data = simulation.initialize_simulation_data(punjab_cities)
     print("\n[INFO] All Hybrid Missions Completed. Queue reset.")
     print("[INFO] Active Data updated: Critical zones marked as Safe.")
     
@@ -170,8 +166,10 @@ def main():
                 simulation.run_flood_simulation(target, active_data)
             else:
                 print(f"[ERROR]: '{target}' not found.")
+
         elif choice == '2':
             queue = get_critical_priority_queue(active_data)
+
             if not queue:
                 print("\n[INFO]: No active alerts.")
             else:
@@ -180,11 +178,14 @@ def main():
                 for city, score in queue:
                     status = active_data[city].get('road_status', 'Unknown')
                     print(f" {city:<20} | {score:<10.2f} | {status}")
+
         elif choice == '3':
             execute_rescue_operations(active_data)
+
         elif choice == '4':
             active_data = simulation.initialize_simulation_data(punjab_cities)
             print("[SYSTEM]: Simulation Data Reset.")
+
         elif choice == '5':
             print("[SYSTEM]: Shutting down Command Center. Goodbye.")
             break
