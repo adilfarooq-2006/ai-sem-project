@@ -16,13 +16,31 @@ def initializeFleet():
     fleet = []
     # 50 Trucks - Capacity 3000kg
     for i in range(1, 51):
-        fleet.append({"id": f"Truck-{i}", "type": "truck", "capacity": 3000, "speed": "slow", "available": True})
+        fleet.append({
+            "id": f"Truck-{i}",
+            "type": "truck",
+            "capacity": 3000,
+            "speed": "slow",
+            "available": True
+        })
     # 50 Drones - Capacity 50kg (Total Swarm Capacity: 2500kg)
     for i in range(1, 51):
-        fleet.append({"id": f"Drone-{i}", "type": "drone", "capacity": 50, "speed": "fast", "available": True})
+        fleet.append({
+            "id": f"Drone-{i}",
+            "type": "drone",
+            "capacity": 50,
+            "speed": "fast",
+            "available": True
+        })
     # 10 Helis - Capacity 25000kg
     for i in range(1, 11):
-        fleet.append({"id": f"Helicopter-{i}", "type": "heli", "capacity": 25000, "speed": "fast", "available": True})
+        fleet.append({
+            "id": f"Helicopter-{i}",
+            "type": "heli",
+            "capacity": 25000,
+            "speed": "fast",
+            "available": True
+        })
     return fleet
 
 def check_valid_for_split_delivery(vehicle, city_demand):
@@ -42,32 +60,68 @@ def get_prioritized_fleet(fleet, city_demand):
     def sort_key(vehicle):
         v_type = vehicle["type"]
 
-        # IF ROADS ARE BLOCKED: Decide based on weight threshold
+        # ROADS BLOCKED → AIR VEHICLES ONLY
         if road_status == "Blocked":
-            if needed_weight > SWARM_LIMIT:
-                # Priority: Heli -> Drone (Heli is first choice for heavy loads)
-                return 1 if v_type == "heli" else 2 if v_type == "drone" else 999
-            else:
-                # Priority: Drone -> Heli (Drones are first choice for lighter loads)
-                return 1 if v_type == "drone" else 2 if v_type == "heli" else 999
 
-        # IF ROADS ARE OPEN: Trucks are always priority #1
+            # HEAVY LOAD → HELI FIRST
+            if needed_weight > SWARM_LIMIT:
+                if v_type == "heli":
+                    return 1
+                if v_type == "drone":
+                    return 2
+
+            # LIGHT LOAD → DRONE FIRST
+            else:
+                if v_type == "drone":
+                    return 1
+                if v_type == "heli":
+                    return 2
+
+        # ROADS OPEN → LAND VEHICLES FIRST
         else:
-            if v_type == "truck": return 1
-            if v_type == "emergency_truck": return 2
-            # For open roads, if trucks are busy, air support follows the same weight rule
-            if needed_weight > SWARM_LIMIT:
-                return 3 if v_type == "heli" else 4 if v_type == "drone" else 999
-            else:
-                return 3 if v_type == "drone" else 4 if v_type == "heli" else 999
+            if v_type == "truck":
+                return 1
 
+            if v_type == "emergency_truck":
+                return 2
+
+            # FALLBACK TO AIR VEHICLES
+            if needed_weight > SWARM_LIMIT:
+                if v_type == "heli":
+                    return 3
+                if v_type == "drone":
+                    return 4
+            else:
+                if v_type == "drone":
+                    return 3
+                if v_type == "heli":
+                    return 4
+
+        # LOWEST PRIORITY FOR OTHERS
+        return 999
+
+    # SORT VEHICLES BY PRIORITY
     return sorted(available_vehicles, key=sort_key)
 
+# Creates a single emergency vehicle object with all necessary
+# properties basically triggers when fleet run out of vehicles.
 def create_emergency_vehicle(idx, is_air_support=False):
-    # Fallback if the initial fleet is exhausted
     if is_air_support:
-        return {"id": f"AirLift-{idx}", "type": "heli", "capacity": 50000, "speed": "fast", "available": True}
-    return {"id": f"Rental-Truck-{idx}", "type": "emergency_truck", "capacity": 5000, "speed": "slow", "available": True}
+        return {
+            "id": f"AirLift-{idx}",
+            "type": "heli",
+            "capacity": 50000,
+            "speed": "fast",
+            "available": True
+        }
+    return {
+        "id": f"Rental-Truck-{idx}",
+        "type": "emergency_truck",
+        "capacity": 5000,
+        "speed": "slow",
+        "available": True
+    }
+
 
 def assign_resources(flooded_cities_list):
     fleet = initializeFleet()
