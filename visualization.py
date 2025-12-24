@@ -4,19 +4,15 @@ import os
 
 
 def generate_mission_map(active_data, path=None, assignments=None, filename="mission_map.html", output_folder="maps"):
-    """
-    Generates an interactive HTML map.
-    - Blue Line (Default): Helicopter Support
-    - Green Line: Ground Trucking
-    - Orange Line: Drone Swarm
-    """
+    # Blue Line (Default): Helicopter Support
+    # Green Line: Ground Trucks
+    # Orange Line: Drone Swarm
+
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
 
-    # 1. Create Base Map
+    # This line creates a base map
     m = folium.Map(location=[31.1704, 72.7097], zoom_start=7)
-
-    # 2. DEFAULT COLOR LOGIC
     # We set Heli (Blue) as the default starting point
     path_color = "blue"
     vehicle_label = "Helicopter Support"
@@ -27,7 +23,7 @@ def generate_mission_map(active_data, path=None, assignments=None, filename="mis
         # If 'truck' is found, override default to Green
         if "truck" in log_str or "rental" in log_str:
             path_color = "green"
-            vehicle_label = "Ground Trucking"
+            vehicle_label = "Ground Trucks"
 
         # If 'drone' is found, override default to Orange
         elif "drone" in log_str:

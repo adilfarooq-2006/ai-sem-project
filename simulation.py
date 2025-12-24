@@ -2,10 +2,6 @@ import copy
 import random
 
 
-# ==========================================================
-# 1. DATA INITIALIZATION FUNCTION
-# ==========================================================
-
 def initialize_simulation_data(punjab_cities):
     # CREATE DEEP COPY TO PROTECT ORIGINAL DATASET
     sim_data = copy.deepcopy(punjab_cities)
@@ -20,10 +16,6 @@ def initialize_simulation_data(punjab_cities):
 
     return sim_data
 
-
-# ==========================================================
-# 2. PRIORITY AND IMPACT CALCULATION LOGIC
-# ==========================================================
 
 def update_priority_score(city_data):
     # FORMULA PRIORITY = INJURIES * 10 + SEVERITY * 500
@@ -67,10 +59,6 @@ def process_flood_impact(city_name, new_severity, cities_data):
     return False
 
 
-# ==========================================================
-# 3. FLOOD SPREAD SIMULATION ENGINE
-# ==========================================================
-
 def run_flood_simulation(start_city, cities_data, max_cities_limit=25):
     # VALIDATE START CITY EXISTS
     if start_city not in cities_data:
@@ -104,9 +92,6 @@ def run_flood_simulation(start_city, cities_data, max_cities_limit=25):
         # PROCESS IMPACT AND CHECK IF UPDATE HAPPENED
         was_updated = process_flood_impact(current_city_name, current_severity, cities_data)
 
-        # ------------------------------------------------------
-        # SPREAD TO NEIGHBORS
-        # ------------------------------------------------------
         curr_elev = cities_data[current_city_name]['elevation']
         neighbors = cities_data[current_city_name]['neighbors']
 
